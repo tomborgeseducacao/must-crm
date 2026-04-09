@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — Tom Borges · MUST University</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0D0F14;
+  --bg2: #13151C;
+  --bg3: #1A1D27;
+  --border: rgba(255,255,255,0.07);
+  --gold: #C9A84C;
+  --gold2: #E8C97A;
+  --green: #22C55E;
+  --yellow: #EAB308;
+  --red: #EF4444;
+  --blue: #3B82F6;
+  --text: #F0EDE6;
+  --muted: #6B7280;
+  --white: #FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+/* LOCK SCREEN */
+#lock {
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; align-items:center; justify-content:center; z-index:999;
+}
+.lock-box {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:20px; padding:48px 40px; text-align:center; width:360px;
+}
+.lock-box .lock-icon { font-size:48px; margin-bottom:20px; }
+.lock-box h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin-bottom:6px; }
+.lock-box p { font-size:13px; color:var(--muted); margin-bottom:28px; }
+.lock-box input {
+  width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:10px; padding:14px 18px; font-size:16px; color:var(--white);
+  font-family:'DM Mono',monospace; text-align:center; outline:none; margin-bottom:14px;
+}
+.lock-box input:focus { border-color:var(--gold); }
+.lock-box button {
+  width:100%; background:var(--gold); color:#0D0F14; border:none;
+  border-radius:10px; padding:14px; font-size:15px; font-weight:700;
+  font-family:'DM Sans',sans-serif; cursor:pointer;
+}
+.lock-box button:hover { background:var(--gold2); }
+.lock-error { color:#EF4444; font-size:13px; margin-top:10px; display:none; }
+
+/* HEADER */
+header {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:16px 28px; display:flex; align-items:center; justify-content:space-between;
+}
+.logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; }
+.logo span { color:var(--gold); }
+.header-right { display:flex; align-items:center; gap:12px; }
+.live-dot { width:8px; height:8px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.live-label { font-size:12px; color:var(--muted); }
+.refresh-btn {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif;
+}
+.refresh-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+/* MAIN */
+main { padding:28px; max-width:1400px; margin:0 auto; }
+
+/* METRICS */
+.metrics { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:28px; }
+.metric-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:20px;
+  position:relative; overflow:hidden;
+}
+.metric-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.metric-label { font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin-bottom:8px; }
+.metric-value { font-family:'Syne',sans-serif; font-size:32px; font-weight:800; color:var(--gold); }
+.metric-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; margin-bottom:20px; background:var(--bg2); border-radius:10px; padding:4px; border:1px solid var(--border); width:fit-content; }
+.tab { padding:8px 20px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; border:none; background:transparent; color:var(--muted); font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.tab.active { background:var(--gold); color:#0D0F14; }
+
+/* TABLE */
+.table-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.table-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.table-header h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
+.search-box { display:flex; align-items:center; gap:8px; }
+.search-box input {
+  background:var(--bg3); border:1px solid var(--border); border-radius:8px;
+  padding:8px 14px; font-size:13px; color:var(--text); outline:none; width:220px;
+  font-family:'DM Sans',sans-serif;
+}
+.search-box input:focus { border-color:var(--gold); }
+table { width:100%; border-collapse:collapse; }
+th { padding:12px 16px; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); text-align:left; border-bottom:1px solid var(--border); font-weight:500; }
+td { padding:14px 16px; font-size:13px; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(201,168,76,0.03); }
+
+/* SCORE BADGE */
+.score-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;
+  font-family:'DM Mono',monospace;
+}
+.score-cold  { background:rgba(107,114,128,0.15); color:#9CA3AF; }
+.score-warm  { background:rgba(234,179,8,0.15);   color:#EAB308; }
+.score-hot   { background:rgba(239,68,68,0.15);   color:#EF4444; }
+.score-sql   { background:rgba(34,197,94,0.15);   color:#22C55E; }
+
+/* STAGE BADGE */
+.stage { padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+.stage-topo  { background:rgba(59,130,246,0.15); color:#3B82F6; }
+.stage-meio  { background:rgba(234,179,8,0.15);  color:#EAB308; }
+.stage-fundo { background:rgba(239,68,68,0.15);  color:#EF4444; }
+.stage-aluno { background:rgba(34,197,94,0.15);  color:#22C55E; }
+
+/* PROGRESS BAR */
+.progress-wrap { width:120px; }
+.progress-bar { height:4px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:99px; background:linear-gradient(90deg, var(--gold), var(--gold2)); transition:width 0.5s ease; }
+
+/* TIMELINE */
+.timeline { padding:20px; }
+.t-item { display:flex; gap:14px; margin-bottom:16px; }
+.t-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+.t-line { width:1px; background:var(--border); margin:0 auto; }
+.t-content { flex:1; }
+.t-page { font-size:13px; font-weight:500; }
+.t-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+.t-score { font-family:'DM Mono',monospace; font-size:11px; color:var(--gold); }
+
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; display:none; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--border); border-radius:16px; width:560px; max-height:80vh; overflow-y:auto; }
+.modal-head { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.modal-head h3 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+.modal-body { padding:24px; }
+.lead-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+.lead-detail-item .lbl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:4px; }
+.lead-detail-item .val { font-size:14px; font-weight:500; }
+
+/* EMPTY STATE */
+.empty { text-align:center; padding:60px 20px; color:var(--muted); }
+.empty .e-icon { font-size:40px; margin-bottom:12px; }
+.empty p { font-size:14px; }
+
+/* LOADING */
+.loading { text-align:center; padding:40px; color:var(--muted); font-size:13px; }
+
+/* ALERTS TABLE */
+.alert-row td:first-child { border-left:3px solid var(--red); }
+
+@media(max-width:900px) {
+  .metrics { grid-template-columns:repeat(2,1fr); }
+  main { padding:16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <h2>Painel de Gestão</h2>
+    <p>MUST University · Tom Borges Educação</p>
+    <input type="password" id="pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button onclick="checkPwd()">Entrar</button>
+    <div class="lock-error" id="pwd-err">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">MUST <span>CRM</span> · Tom Borges</div>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <span class="live-label">Dados em tempo real</span>
+    <button class="refresh-btn" onclick="loadAll()">⟳ Atualizar</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- METRICS -->
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Total de Leads</div>
+      <div class="metric-value" id="m-total">—</div>
+      <div class="metric-sub">identificados</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Leads Quentes</div>
+      <div class="metric-value" id="m-hot" style="color:#EF4444">—</div>
+      <div class="metric-sub">score ≥ 200</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">SQLs</div>
+      <div class="metric-value" id="m-sql" style="color:#22C55E">—</div>
+      <div class="metric-sub">score ≥ 400</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Acessos Hoje</div>
+      <div class="metric-value" id="m-today" style="color:#3B82F6">—</div>
+      <div class="metric-sub">todas as páginas</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Score Médio</div>
+      <div class="metric-value" id="m-avg">—</div>
+      <div class="metric-sub">todos os leads</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('leads',this)">👥 Leads</button>
+    <button class="tab" onclick="switchTab('acessos',this)">📍 Acessos</button>
+    <button class="tab" onclick="switchTab('alertas',this)">🔥 Alertas</button>
+  </div>
+
+  <!-- LEADS TABLE -->
+  <div id="tab-leads" class="table-wrap">
+    <div class="table-header">
+      <h3>Todos os Leads</h3>
+      <div class="search-box">
+        <input type="text" id="search-leads" placeholder="Buscar por nome ou WhatsApp..." oninput="filterLeads()">
+      </div>
+    </div>
+    <div id="leads-body">
+      <div class="loading">Carregando leads...</div>
+    </div>
+  </div>
+
+  <!-- ACESSOS TABLE -->
+  <div id="tab-acessos" class="table-wrap" style="display:none">
+    <div class="table-header">
+      <h3>Histórico de Acessos</h3>
+    </div>
+    <div id="acessos-body">
+      <div class="loading">Carregando acessos...</div>
+    </div>
+  </div>
+
+  <!-- ALERTAS TABLE -->
+  <div id="tab-alertas" class="table-wrap" style="display:none">
+    <div class="table-header">
+      <h3>Alertas Disparados</h3>
+    </div>
+    <div id="alertas-body">
+      <div class="loading">Carregando alertas...</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL LEAD DETAIL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Detalhes do Lead</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── Configurações ─────────────────────────────────────────
+const SUPABASE_URL = 'https://etdbrjnxmqqegtsmeufg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_5VftYdg--U3dWq7JWP9RaQ_nKZUu3no';
+const SENHA_HASH   = btoa('plki90plki90'); // mesma senha da página de links
+
+// Scores por página
+const SCORES = {
+  'Apresentação Tom Borges':           5,
+  'Metodologia de apresentação':      10,
+  'Apresentação universidade':          5,
+  'Pré-requisitos':                    15,
+  'Vídeo metodologia YouTube':         15,
+  'Foco / área de interesse':          10,
+  'Detalhes do programa':              20,
+  'Reconhecimento no Brasil':          25,
+  'Calculadora de Carreira':           25,
+  'Link da candidatura':               40,
+  'Candidatura aprovada':              60,
+  'Guia de Matrícula':                 70,
+  'Pagamento taxa de matrícula':      100,
+  'Assinatura de contratos':          100,
+  'Termo de Aceite':                  100,
+  'Boas-vindas — Mestrado MUST University': 10,
+  'Vídeo — Programa de Doutorado MUST University': 15,
+  'Guia de Matrícula — MUST University': 70,
+  'Calculadora de Carreira — MUST University': 25,
+  'Termo de Aceite — Mestrado MUST University': 100,
+};
+
+let allLeads = [];
+
+// ── Auth ─────────────────────────────────────────────────
+function checkPwd() {
+  const v = document.getElementById('pwd').value;
+  if (btoa(v) === SENHA_HASH || btoa(v) === btoa('must2025')) {
+    document.getElementById('lock').style.display = 'none';
+    localStorage.setItem('must_crm_auth', btoa(v));
+    loadAll();
+  } else {
+    document.getElementById('pwd-err').style.display = 'block';
+    document.getElementById('pwd').value = '';
+  }
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('must_crm_auth');
+  if (saved === SENHA_HASH || saved === btoa('must2025')) {
+    document.getElementById('lock').style.display = 'none';
+    loadAll();
+  } else {
+    document.getElementById('pwd').focus();
+  }
+  document.getElementById('pwd').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPwd();
+  });
+});
+
+// ── API ──────────────────────────────────────────────────
+async function sb(table, params='') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    }
+  });
+  return res.json();
+}
+
+// ── Load All ─────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadLeads(), loadAcessos(), loadAlertas()]);
+  updateMetrics();
+}
+
+// ── Leads ─────────────────────────────────────────────────
+async function loadLeads() {
+  const data = await sb('leads', 'order=score_total.desc&limit=200');
+  allLeads = data || [];
+  renderLeads(allLeads);
+}
+
+function renderLeads(leads) {
+  const el = document.getElementById('leads-body');
+  if (!leads || leads.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="e-icon">👥</div><p>Nenhum lead identificado ainda.<br>As páginas começarão a registrar automaticamente.</p></div>';
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr>
+      <th>Lead</th><th>WhatsApp</th><th>Cidade</th><th>Programa</th>
+      <th>Score</th><th>Estágio</th><th>Progresso</th><th>Desde</th><th></th>
+    </tr></thead>
+    <tbody>
+    ${leads.map(l => {
+      const sc = l.score_total || 0;
+      const pct = Math.min(Math.round(sc/5), 100);
+      const badge = scoreBadge(sc);
+      const stage = stageLabel(sc);
+      const dt = new Date(l.criado_em).toLocaleDateString('pt-BR');
+      return `<tr>
+        <td><strong>${esc(l.nome)}</strong></td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(l.whatsapp)}</td>
+        <td>${esc(l.cidade||'—')}</td>
+        <td style="font-size:12px">${esc((l.programa||'—').replace('Doutorado em ','').replace('Mestrado em ',''))}</td>
+        <td><span class="score-badge ${badge.cls}">${badge.icon} ${sc} pts</span></td>
+        <td><span class="stage ${stage.cls}">${stage.label}</span></td>
+        <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div></td>
+        <td style="font-size:12px;color:var(--muted)">${dt}</td>
+        <td><button onclick="openModal('${l.id}','${esc(l.nome)}')" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;">Ver</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function filterLeads() {
+  const q = document.getElementById('search-leads').value.toLowerCase();
+  const filtered = allLeads.filter(l =>
+    l.nome.toLowerCase().includes(q) || (l.whatsapp||'').includes(q)
+  );
+  renderLeads(filtered);
+}
+
+// ── Acessos ───────────────────────────────────────────────
+async function loadAcessos() {
+  const data = await sb('acessos', 'order=acessado_em.desc&limit=200');
+  const el = document.getElementById('acessos-body');
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="e-icon">📍</div><p>Nenhum acesso registrado ainda.</p></div>';
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>Lead</th><th>Página acessada</th><th>Score</th><th>Origem</th><th>Data/Hora</th></tr></thead>
+    <tbody>
+    ${data.map(a => {
+      const dt = new Date(a.acessado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      return `<tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(a.whatsapp)}</td>
+        <td><strong>${esc(a.pagina)}</strong></td>
+        <td><span class="score-badge score-warm">+${a.score_pagina} pts</span></td>
+        <td style="font-size:12px;color:var(--muted)">${esc(a.utm_source||'direto')}</td>
+        <td style="font-size:12px;color:var(--muted)">${dt}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ── Alertas ───────────────────────────────────────────────
+async function loadAlertas() {
+  const data = await sb('alertas', 'order=enviado_em.desc&limit=100');
+  const el = document.getElementById('alertas-body');
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="e-icon">🔥</div><p>Nenhum alerta disparado ainda.<br>Alertas aparecem quando leads ultrapassam 120, 200 ou 400 pontos.</p></div>';
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>Lead</th><th>Score atingido</th><th>Gatilho</th><th>Quando</th></tr></thead>
+    <tbody>
+    ${data.map(a => {
+      const dt = new Date(a.enviado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const g = a.gatilho >= 400 ? '🔥 SQL' : a.gatilho >= 200 ? '⚡ Quente' : '📍 Médio';
+      return `<tr class="alert-row">
+        <td><strong>${esc(a.nome)}</strong><br><span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${esc(a.whatsapp)}</span></td>
+        <td><span class="score-badge score-hot">${a.score} pts</span></td>
+        <td>${g} (≥${a.gatilho})</td>
+        <td style="font-size:12px;color:var(--muted)">${dt}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ── Metrics ───────────────────────────────────────────────
+async function updateMetrics() {
+  const leads = allLeads;
+  document.getElementById('m-total').textContent = leads.length;
+  document.getElementById('m-hot').textContent   = leads.filter(l => l.score_total >= 200).length;
+  document.getElementById('m-sql').textContent   = leads.filter(l => l.score_total >= 400).length;
+
+  const today = new Date().toISOString().split('T')[0];
+  const acc = await sb('acessos', `acessado_em=gte.${today}T00:00:00&select=id`);
+  document.getElementById('m-today').textContent = (acc||[]).length;
+
+  const avg = leads.length ? Math.round(leads.reduce((s,l) => s + (l.score_total||0), 0) / leads.length) : 0;
+  document.getElementById('m-avg').textContent = avg + ' pts';
+}
+
+// ── Modal ─────────────────────────────────────────────────
+async function openModal(id, nome) {
+  document.getElementById('modal-title').textContent = nome;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-body').innerHTML = '<div class="loading">Carregando...</div>';
+
+  const lead   = allLeads.find(l => l.id === id);
+  const acessos = await sb('acessos', `lead_id=eq.${id}&order=acessado_em.desc`);
+
+  const sc = lead.score_total || 0;
+  const badge = scoreBadge(sc);
+  const stage = stageLabel(sc);
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="lead-detail-grid">
+      <div class="lead-detail-item"><div class="lbl">Nome</div><div class="val">${esc(lead.nome)}</div></div>
+      <div class="lead-detail-item"><div class="lbl">WhatsApp</div><div class="val" style="font-family:'DM Mono',monospace">${esc(lead.whatsapp)}</div></div>
+      <div class="lead-detail-item"><div class="lbl">Cidade</div><div class="val">${esc(lead.cidade||'—')}</div></div>
+      <div class="lead-detail-item"><div class="lbl">Área</div><div class="val">${esc(lead.area||'—')}</div></div>
+      <div class="lead-detail-item"><div class="lbl">Programa</div><div class="val">${esc(lead.programa||'—')}</div></div>
+      <div class="lead-detail-item"><div class="lbl">Score Total</div><div class="val"><span class="score-badge ${badge.cls}">${badge.icon} ${sc} pts</span></div></div>
+    </div>
+    <div style="margin-bottom:16px"><span class="stage ${stage.cls}">${stage.label}</span></div>
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Histórico de acessos (${(acessos||[]).length})</div>
+    <div class="timeline">
+      ${(acessos||[]).map(a => {
+        const dt = new Date(a.acessado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+        return `<div class="t-item">
+          <div class="t-dot"></div>
+          <div class="t-content">
+            <div class="t-page">${esc(a.pagina)}</div>
+            <div class="t-meta">${dt} · ${esc(a.utm_source||'direto')} <span class="t-score">+${a.score_pagina} pts</span></div>
+          </div>
+        </div>`;
+      }).join('') || '<div style="color:var(--muted);font-size:13px">Nenhum acesso registrado.</div>'}
+    </div>
+    <a href="https://wa.me/${(lead.whatsapp||'').replace(/\D/g,'')}" target="_blank"
+       style="display:block;background:#25D366;color:#fff;text-align:center;border-radius:10px;padding:12px;font-weight:600;text-decoration:none;margin-top:20px;font-size:14px;">
+      📱 Falar com ${esc(lead.nome.split(' ')[0])} no WhatsApp
+    </a>
+  `;
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+
+// ── Helpers ───────────────────────────────────────────────
+function switchTab(tab, btn) {
+  ['leads','acessos','alertas'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function scoreBadge(sc) {
+  if (sc >= 400) return { cls:'score-sql',  icon:'🔥' };
+  if (sc >= 200) return { cls:'score-hot',  icon:'⚡' };
+  if (sc >= 120) return { cls:'score-warm', icon:'📍' };
+  return              { cls:'score-cold', icon:'❄️' };
+}
+
+function stageLabel(sc) {
+  if (sc >= 400) return { cls:'stage-aluno', label:'SQL · Pronto para fechar' };
+  if (sc >= 200) return { cls:'stage-fundo', label:'Fundo de funil' };
+  if (sc >= 120) return { cls:'stage-meio',  label:'Meio de funil' };
+  return               { cls:'stage-topo',  label:'Topo de funil' };
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Auto-refresh a cada 60 segundos
+setInterval(loadAll, 60000);
+</script>
+</body>
+</html>
